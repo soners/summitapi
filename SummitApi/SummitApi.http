@@ -1,0 +1,14 @@
+@SummitApi_HostAddress = https://localhost:7010
+@Summit_ScoreApi_HostAddress = https://localhost:7157
+
+POST {{SummitApi_HostAddress}}/teachers/b75n49c/students/68b3nak/pair
+Accept: application/json
+
+###
+
+
+POST {{Summit_ScoreApi_HostAddress}}/api/students/68b3nak/score?score=70
+Accept: application/json
+
+###
+
