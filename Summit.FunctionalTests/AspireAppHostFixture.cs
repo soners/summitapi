@@ -15,6 +15,8 @@ public class AspireAppHostFixture : IAsyncLifetime
     public MySqlConnection MysqlConnection { get; private set; }
     
     public AwsConnection AwsConnection { get; private set; }
+    
+    public string KafkaConnectionString { get; private set; }
 
     public async Task InitializeAsync()
     {
@@ -42,7 +44,7 @@ public class AspireAppHostFixture : IAsyncLifetime
         await app.ResourceNotifications.WaitForResourceHealthyAsync("mysql").WaitAsync(_defaultTimeout);
         await app.ResourceNotifications.WaitForResourceHealthyAsync("scoremockapi").WaitAsync(_defaultTimeout);
         await app.ResourceNotifications.WaitForResourceHealthyAsync("summitapi").WaitAsync(_defaultTimeout);
-        await app.ResourceNotifications.WaitForResourceHealthyAsync("pairrequestedworker").WaitAsync(_defaultTimeout);
+        await app.ResourceNotifications.WaitForResourceHealthyAsync("summitworker").WaitAsync(_defaultTimeout);
 
         HttpClient = app.CreateHttpClient("summitapi");
         
@@ -57,6 +59,8 @@ public class AspireAppHostFixture : IAsyncLifetime
         {
             AwsConnection = new AwsConnection(endpoints.First().AllocatedEndpoint.UriString);
         }
+
+        KafkaConnectionString = await app.GetConnectionStringAsync("kafka");
     }
 
     public async Task DisposeAsync()

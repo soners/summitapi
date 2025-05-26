@@ -26,6 +26,9 @@ builder.Services.AddSingleton(_ =>
     return new AmazonSQSClient(sqsConfig);
 });
 
+// Wait for 10 seconds to start polling
+Thread.Sleep(10 * 1000);
+
 builder.Services.AddAWSMessageBus(busBuilder =>
 {
     busBuilder.AddMessageHandler<PairMessageHandler, PairMessage>("summitapi");

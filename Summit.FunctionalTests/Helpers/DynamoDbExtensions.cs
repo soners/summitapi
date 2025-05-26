@@ -13,15 +13,11 @@ public static class DynamoDbExtensions
         var dynamoDbConfig = new AmazonDynamoDBConfig
         {
             EndpointProvider = new StaticEndpointProvider(awsConnection.Url),
-            ServiceURL = awsConnection.Url,
             RegionEndpoint = RegionEndpoint.EUCentral1,
             AuthenticationRegion = RegionEndpoint.EUCentral1.SystemName,
         };
         
-        var awsCredentials = new SessionAWSCredentials("test", "test", "test")
-        {
-            Expiration = DateTime.Now.AddHours(10)
-        };
+        var awsCredentials = new SessionAWSCredentials("test", "test", "test");
         var dynamoDbClient = new AmazonDynamoDBClient(awsCredentials, dynamoDbConfig);
 
         var putItemRequest = new PutItemRequest
