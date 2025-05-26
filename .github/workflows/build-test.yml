@@ -30,5 +30,8 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
+      - name: Trust Dev Certs
+        run: dotnet dev-certs https --trust
+
       - name: Test
         run: dotnet test --no-restore --verbosity normal
