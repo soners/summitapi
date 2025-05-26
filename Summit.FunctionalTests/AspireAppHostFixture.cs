@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
 using Summit.FunctionalTests.Helpers;
@@ -31,7 +32,13 @@ public class AspireAppHostFixture : IAsyncLifetime
         });
         appHost.Services.ConfigureHttpClientDefaults(clientBuilder =>
         {
-            // clientBuilder.AddStandardResilienceHandler();
+            clientBuilder.AddStandardResilienceHandler(options =>
+            {
+                options.AttemptTimeout = options.TotalRequestTimeout = new HttpTimeoutStrategyOptions()
+                {
+                    Timeout = TimeSpan.FromMinutes(2)
+                };
+            });
         });
 
         var app = await appHost.BuildAsync().WaitAsync(_defaultTimeout);
