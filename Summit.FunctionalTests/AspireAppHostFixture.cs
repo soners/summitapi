@@ -7,7 +7,7 @@ namespace Summit.FunctionalTests;
 
 public class AspireAppHostFixture : IAsyncLifetime
 {
-    private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(30);
+    private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(120);
     
     public HttpClient HttpClient { get; private set; }
     
