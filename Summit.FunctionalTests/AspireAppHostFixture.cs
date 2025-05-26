@@ -38,6 +38,10 @@ public class AspireAppHostFixture : IAsyncLifetime
                 {
                     Timeout = TimeSpan.FromMinutes(2)
                 };
+                options.CircuitBreaker = new HttpCircuitBreakerStrategyOptions()
+                {
+                    SamplingDuration = TimeSpan.FromMinutes(4)
+                };
             });
         });
 
