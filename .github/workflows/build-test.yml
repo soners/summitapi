@@ -48,7 +48,7 @@ jobs:
         if: always()
         with:
           name: .NET Test Results
-          path: TestResults
+          path: TestResults/*.trx
           reporter: dotnet-trx
 
       - name: Build Docker image
