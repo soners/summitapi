@@ -38,10 +38,18 @@ jobs:
 
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        if: always()
         with:
           name: dotnet-results
           path: TestResults
+
+      - name: Publish test results to GitHub UI
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: .NET Test Results
+          path: TestResults
+          reporter: dotnet-trx
 
       - name: Build Docker image
         run: docker build -t summitapi:latest .
