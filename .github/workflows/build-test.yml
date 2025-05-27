@@ -34,7 +34,14 @@ jobs:
         run: dotnet dev-certs https --trust
 
       - name: Test
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test --no-restore --verbosity normal --logger trx --results-directory "TestResults"
+
+      - name: Upload dotnet test results
+        uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: dotnet-results
+          path: TestResults
 
       - name: Build Docker image
         run: docker build -t summitapi:latest .
