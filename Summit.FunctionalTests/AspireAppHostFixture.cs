@@ -72,6 +72,8 @@ public class AspireAppHostFixture : IAsyncLifetime
         }
 
         KafkaConnectionString = await app.GetConnectionStringAsync("kafka");
+
+        await AwsConnection.EnsureLocalStackIsReadyAsync();
     }
 
     public async Task DisposeAsync()
