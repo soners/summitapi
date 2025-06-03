@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using AWS.Messaging;
 using Confluent.Kafka;
 
@@ -9,6 +10,7 @@ public class PairMessageHandler(IConfiguration configuration) : IMessageHandler<
     public async Task<MessageProcessStatus> HandleAsync(MessageEnvelope<PairMessage> messageEnvelope,
         CancellationToken cancellationToken)
     {
+        var pairMessage = messageEnvelope.Message;
         var pairCode = Convert.ToHexString(Encoding.UTF8.GetBytes(new Random().Next().ToString())[..3]);
 
         var config = new ProducerConfig
@@ -16,11 +18,12 @@ public class PairMessageHandler(IConfiguration configuration) : IMessageHandler<
             BootstrapServers = configuration.GetConnectionString("kafka"),
         };
 
+        var pairRequestedMessage = new PairRequestedMessage(pairMessage.Teacher, pairMessage.Student, pairCode);
         using var producer = new ProducerBuilder<Null, string>(config).Build();
 
-        await producer.ProduceAsync(topic: "pair-processed", new Message<Null, string>
+        await producer.ProduceAsync(topic: "pair-request-processed", new Message<Null, string>
         {
-            Value = pairCode
+            Value = JsonSerializer.Serialize(pairRequestedMessage)
         }, cancellationToken);
 
         return MessageProcessStatus.Success();

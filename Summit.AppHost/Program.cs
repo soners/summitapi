@@ -13,6 +13,7 @@ var mysql = builder.AddMySql("mysql")
     .AddDatabase("public");
 
 var kafka = builder.AddKafka("kafka")
+    .WithBindMount("../local/init-kafka.sh", "/tmp/create-topics.sh")
     .WithKafkaUI();
 
 var studentScoreMockApi = builder.AddProject<Projects.Summit_Mocks_StudentScoreApi>("scoremockapi");
