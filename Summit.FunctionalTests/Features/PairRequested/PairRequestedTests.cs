@@ -1,11 +1,5 @@
-using System.Text.Json;
-using Amazon;
-using Amazon.Runtime;
-using Amazon.Runtime.Endpoints;
-using Amazon.SimpleNotificationService;
-using Amazon.SimpleNotificationService.Model;
-using AWS.Messaging;
 using Confluent.Kafka;
+using Summit.FunctionalTests.Helpers;
 using Xunit.Abstractions;
 
 namespace Summit.FunctionalTests.Features.PairRequested;
@@ -14,47 +8,24 @@ namespace Summit.FunctionalTests.Features.PairRequested;
 public class PairRequestedTests(AspireAppHostFixture fixture, ITestOutputHelper testOutputHelper)
 {
     [Fact]
-    public async Task Pair_WhenRequestedForTeacherAndStudentWithHighScore_ShouldReturnAccepted()
+    public async Task PairRequested_WhenReceived_ShouldProcessAndPublishToKafka()
     {
         // Arrange
-        var snsConfig = new AmazonSimpleNotificationServiceConfig
+        await fixture.AwsConnection.PushMessage(new
         {
-            EndpointProvider = new StaticEndpointProvider(fixture.AwsConnection.Url),
-            RegionEndpoint = RegionEndpoint.EUCentral1,
-            AuthenticationRegion = RegionEndpoint.EUCentral1.SystemName,
-        };
-        var awsCredentials = new SessionAWSCredentials("test", "test", "test");
-
-        var snsClient = new AmazonSimpleNotificationServiceClient(awsCredentials, snsConfig);
-        
-        var message = new MessageEnvelope<string>
-        {
-            Id = Guid.NewGuid().ToString(),
-            Source = new Uri("/aws/messaging"),
-            Version = "1.0",
-            MessageTypeIdentifier = "summitapi",
-            Message = JsonSerializer.Serialize(new
+            Student = new
             {
-                Student = new
-                {
-                    StudentId = "student-id"
-                },
-                Teacher = new
-                {
-                    TeacherId = "teacher-id"
-                }
-            }),
-            TimeStamp = DateTime.UtcNow
-        };
-
-        // Act
-        var pushRequest = new PublishRequest
-        {
-            TopicArn = "arn:aws:sns:eu-central-1:000000000000:teacher-student-pair-requested",
-            Message = JsonSerializer.Serialize(message)
-        };
-        
-        await snsClient.PublishAsync(pushRequest);
+                StudentId = "student-id",
+                Name = "John",
+                Email = "john.doe@gmail.com",
+            },
+            Teacher = new
+            {
+                TeacherId = "teacher-id",
+                Name = "Brian",
+                Email = "brian.doe@gmail.com",
+            }
+        });
 
         using var cts = new CancellationTokenSource();
 
@@ -69,7 +40,7 @@ public class PairRequestedTests(AspireAppHostFixture fixture, ITestOutputHelper 
 
             using var consumer = new ConsumerBuilder<Ignore, string>(config).Build();
 
-            // Wait for kafka to be available
+            // Wait for kafka to be available, consider using Polly.
             await Task.Delay(10 * 1000);
             consumer.Subscribe(topic: "pair-request-processed");
 
